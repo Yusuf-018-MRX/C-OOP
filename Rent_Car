@@ -1,0 +1,178 @@
+#include <iostream>
+using namespace std;
+class CarInfo {
+public:
+	string marka;
+	float speed;
+	string country;
+	short int year;
+	int beyqir;
+	int motor;
+private:
+	bool icare = true;
+public:
+	void status() {
+		cout << "\033[32mThe Car Info <>\033[0m" << endl;
+		cout << "Marka: " << marka << endl;
+		cout << "Speed: " << speed << endl;
+		cout << "From: " << country << endl;
+		cout << "Year: " << year << endl;
+		cout << "Motor: V-" << motor<<endl;
+		cout << "Beyqir: " << beyqir<<endl;
+	};
+	void check1() {
+		if (icare == true) {
+			cout << "Tebrikler " << marka << " Markali masini icareye aldiniz ";
+			icare = false;
+		}
+		else {
+			cout << "Bu Car artiq Alinib";
+		}
+	}
+	void  qaytar() {
+		if (icare == false) {
+			cout << "BU car artiq sizin deyil car qaytarildi !";
+			icare = true;
+		}
+		else {
+			cout << "Sizin secdiyiniz masin icareye verilmeyim qaytarilma islemi gorule bilmir !!!";
+		}
+	}
+public:
+	string marka2="Mersedes";
+	float speed2=200;
+	string country2="Germany";
+	short int year2=2022;
+	int beyqir2=400;
+	int motor2=8;
+private:
+	bool icare2 = true;
+public:
+	void status2() {
+		cout << "\033[32mThe Car Info <>\033[0m"<<endl;
+		cout << "Marka: " << marka2 << endl;
+		cout << "Speed: " << speed2 << endl;
+		cout << "From: " << country2 << endl;
+		cout << "Year: " << year2 << endl;
+		cout << "motor: V-"<<motor2<<endl;
+		cout << "Beyqir: "<<beyqir2<<endl;
+}
+	void check2() {
+		if (icare2 == true) {
+			cout << "Tebrikler " << marka2 << " Markali masini icareye aldiniz ";
+			icare2 = false;
+		}
+		else {
+			cout << "Bu Car artiq Alinib";
+		}
+	}
+};
+int main() {
+	CarInfo car;
+	try {
+		cout << "Etner car info" << endl;
+		cout << "\033[33mMarka: \033[0m";
+		cin >> car.marka;
+		bool hesab = true;
+		while (hesab) {
+			cout << "\033[33mSpeed: \033[0m";
+			cin >> car.speed;
+			cout << "\033[33mYear: \033[0m";
+			cin >> car.year;
+			cout << "\033[33mBeyqir: \033[0m";
+			cin >> car.beyqir;
+			cout << "Motor: V-";
+			cin >> car.motor;
+			if (car.speed < 0 || car.speed>300) {
+				cout << "\033[31mError: Car speed incorrect !!\033[0m" << endl;
+				continue;
+			}
+			else if (car.year < 1940 || car.year>2026) {
+				cout << "\033[31mError: Car year incorrect !!!\033[0m" << endl;
+				continue;
+			}
+			else if (car.beyqir < 50 || car.beyqir>400) {
+				cout << "Error: Daxil etdiyiniz guc super carlara aiddir !!!!"<<endl;
+				continue;
+			}
+			else if (car.motor != 6 || car.motor != 8 || car.motor != 10 || car.motor != 12) {
+				cout << "Error: daxil etdiyiniz V Motor N yanlisdir !!!";
+				continue;
+			}
+			else {
+				hesab = false;
+			}
+		}
+		cout << "\033[33mCountry: \033[0m";
+		cin >> car.country;
+		if (car.speed != int(car.speed) || car.year != (int(car.year))) {
+			throw runtime_error("\033[31mtype is incorrect !!!\033[0m");
+		}
+		else {
+			cout << "\033[32mInfo complate\033[0m" << endl;
+		}
+		cout << "Menu |<>|" << endl;
+		int secim;
+		cout << "1.Car-Status" << endl << "2.Car-Icare" << endl << "3.Car-Qaytar" << endl << "Secim: ";
+		cin >> secim;
+		if (secim < 0 || secim>3) {
+			cout << "\033[31mError: Secim duzgun daxil edilmedi !!!\033[0m";
+		}
+		else if (secim == 1) {
+			cout << "Hansi masin ?";
+			cout << endl << "1." << car.marka << endl << "2." << car.marka << endl;
+			cout << "Secim: ";
+			int secim;
+			cin >> secim;
+			if (secim == 1) {
+				car.status();
+			}
+			else if (secim == 2) {
+				car.status2();
+			}
+		}
+		else if (secim == 2) {
+			cout << "Car icare ucun secim et !";
+			cout << endl << "1." << car.marka << endl << "2." << car.marka2 << "Secim: " << endl;
+			int secim;
+			cin >> secim;
+			if (secim == 1) {
+				car.status();
+				cout << "BU cari icarye goturmek isteyirsiniz ?" << endl << "1.Beli" << endl << "2.Xeyr" << endl << "Secim: ";
+				cin >> secim;
+				if (secim == 1) {
+					car.check1();
+				}
+				else {
+					cout << "seciminiz xeyr olaraq qebul alindi !!!";
+				}
+			}
+			else if (secim == 2) {
+				car.status2();
+				cout << "BU cari icarye goturmek isteyirsiniz ?" << endl << "1.Beli" << endl << "2.Xeyr" << endl << "Secim: ";
+				cin >> secim;
+				if (secim == 1) {
+					cout << "Tebrikler " << car.marka2 << " Markali masini icareye aldiniz ";
+				}
+				else {
+					cout << "Seciminiz xeyr olaraq alindi !!!";
+				}
+			}
+			else if (secim == 3) {
+				string check;
+				cout << "Masinin markasini daxil edin: ";
+				cin >> check;
+				if (check == car.marka || car.marka2 == check) {
+					car.qaytar();
+				}
+				else {
+					cout << "Bizde bele masin yoxdu !!!";
+				}
+			}
+		}
+	}
+		catch (const exception& as) {
+			cerr << "\033[31mError : \033[0m" << as.what() << endl;
+		}
+	return 0;
+}
