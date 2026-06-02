@@ -1,0 +1,149 @@
+
+#include <iostream>
+#include <ctime>
+using namespace std;
+class surucu {
+	string name;
+	string Sirket;
+	int sefer_sayi = 0;
+	float balance = 0;
+	float kart_balance = 0;
+public:
+	float azn;
+	surucu(string name, string Sirket, float azn) {
+		this->name = name;
+		this->azn = azn;
+		this->Sirket = Sirket;
+	}
+	void show_Info() {
+		cout << "Name: " << name << endl << "Sirket: " << Sirket << endl << "KM basina azn: " << azn << endl << "Sefer sayi: " << sefer_sayi << endl;
+	}
+	void qebul(float km) {
+		for (int i = 0;i < 1000;i++) {
+			int secim;
+			cout << "Musteri tapildi " << endl << "Yol uzunluqu: " << km << "Km" << endl;
+			cout << "1.Qebul et\n2.Redd et\nSecim: ";
+			int secim2 = rand() % 2 + 1;
+			int bexsis = rand() % 10 + 1;//bexsisi men sinifdede yaratmisidim ama onda sadece musteri olanda bexsis vermek olurduda indi mende rand ile qoydum belede bexsis vermek olur InsAllah taxici manatliq taxsi deyilde onlara bexsis verilmir yazziqdilar
+			srand(time(0));
+			if (secim == 1) {
+				cout << "Gedis qebul edildi " << endl << "Yol uzunluqu: " << km << "Km" << endl << "Qazanilacaq Mebleg: " << azn * km;
+				sefer_sayi += 1;
+				if (secim2 == 1) {
+					cout << "Musteri odenisi Nagd etmek isteyir ";
+					cout << endl << azn * km + bexsis << " Azn Odenildi " << endl;
+					cout << "Musteri Bexsis verdi: " << bexsis;//uzune uzune vurramki bes kimse bexsis verdide 
+					balance += azn * km + bexsis;
+					cout << "Balance: " << balance;
+				}
+				else if (secim == 2) {
+					cout << "Musteri Odenisi kart ile etmek isteyir ";
+					cout << endl << "Kart: 4169 7388 **** ****";
+					cout << endl << "Gonderilen mebleg: " << azn * km + bexsis;
+					cout << "Musteri Bexsis verdi: " << bexsis << endl;
+					kart_balance += azn * km + bexsis;
+					cout << "Balance: " << kart_balance;
+				}
+				cout << "1.Seferi sonlandir\n2.Gunu bagla\nSecim: ";
+				cin >> secim;
+				if (secim == 1) {
+					cout << "Yeni Muteri axtarilir ..." << endl;
+					continue;
+				}
+				else if (secim == 2) {
+					cout << "Gedisler  baglandi !" << endl << "Bu gunki gedis sayi: " << sefer_sayi << endl << "Total Cash balance: " << balance << endl << "Total kart balance: " << kart_balance;
+					break;
+				}
+				else {
+					cout << "Yanlis secim !!!";
+					break;
+				}
+			}
+			else if (secim == 2) {
+				cout << "Gedis Qebul edilmedi !!!";
+				cout << endl << "Yeni musteri axtarilir ....";
+			}
+			else {
+				cout << "Yanlis secim !!!";
+			}
+		}
+	}
+};
+class musteri {
+	float money;
+public:
+	musteri(float km, int secim2 ){//eslinde bunuda qebul edilib edilmemek kimi yazmaq olardi 
+		cout << "Odenilecek mebleg: " << km *10;
+		if (secim2 == 1) {
+			cout << "Kart: 4169 7388 XXXX XXXX"<<endl;
+			cout << "Money: ";
+			cin >> money;
+			if (money > km * 10) {
+				cout << "Bexsis ucun tesekkurler ";
+			}
+			else if(km*10==money){
+				cout << "Adam kisi olar e paxil olma e yeke kisisen bir iki manat verde ";//babat mirtdasdiqda 
+			}
+			else {
+				cout << "Yetersiz balance kasib san qaqa ?";
+			}
+		}
+		else if (secim2==2) {
+			cout << "Money: ";
+			cin >> money;
+			if (money > km * 10) {
+				cout << "Bexsis ucun tesekkurler ";
+			}
+			else if (km * 10 == money) {
+				cout << "Adam kisi olar e paxil olma e yeke kisisen bir iki manat verde ";//babat mirtdasdiqda 
+			}
+			else {
+				cout << "Yetersiz balance kasib san qaqa ?";
+			}
+		}
+	}
+};
+int main() {
+	int secim;
+	cout << "1.Surucu\n2.Musteri\nSecim: ";
+	cin >> secim;
+	if (secim == 1) {
+		cout << "Taxi secdiniz " << endl;
+		int km = rand() % 30 + 1;
+		srand(time(0));
+		string name;
+		string Sirket;
+		float azn;
+		cout << "Name: " << endl;
+		cin >> name;
+		cout << "Sirket: " << endl;
+		cin >> Sirket;
+		cout << "Km basina Azn: " << endl;
+		cin >> azn;
+		surucu s(name, Sirket, azn);
+		cout << "Taxi secdiniz " << endl;
+		cout << "Melumatiniz <::>";
+		s.show_Info();
+		cout << endl;
+		s.qebul(km);//yene int oldugunu bilirem ama men float isteyirdim eslinde ikinci bir rand yaradib sonra onu 1 ile 10 arasnda qoyub ustdeki km nin yanina yazsaydim tam ondaliq ala bilerdim ama ozumu yormadim cox vaxtim yoxdu bundan sora derslerim var ama yenede bunu fikirlesdim + point
+	}
+	else if (secim == 2) {
+		cout << "Musteri secdiniz " << endl;
+		float km = 0;
+		int secim2;
+		cout << "Km: " << km;//duzdu indi musteri hardan bilsin nece kmdir yol ama men mao hazirlayada bilmezdim eslinde hazir melumat lar ile gedeceyi seherleri hazirlayib aralarindan secdiyi seher gore km vere bilerdim ama men bir program yazmiram yani onsuzda bu kodu yoxladiqdan sora sileceksizde 
+		cin >> km;
+		cout << "Odenis sekli nece olacaq ?\n" << "1.Kart\n2.Nagd\nSecim: ";
+		cin >> secim2;
+		if (secim2 > 2 || secim2 < 0) {
+			cout << "Yanlis secim etdiniz !!!";
+		}
+		else {
+			musteri m(km, secim2);
+		}
+	}
+	else {
+		cout << "Yanlis secim etdiniz !!!";
+	}
+	return 0;
+}
