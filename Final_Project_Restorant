@@ -1,0 +1,530 @@
+#include <iostream>
+#include <typeinfo>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <ctime>
+using namespace std;
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define YELLOW  "\033[33m"
+#define GREEN   "\033[32m"
+class Food {
+public:
+    string name;
+    vector<pair<string, double>> ingredients;
+    double price;
+};
+class Ingredient {
+public:
+    string name;
+    double KG;
+    double P_KG;
+};
+class CITEM {
+public:
+    Food food;
+    double extraPrice;
+};
+
+class Register {
+protected:
+    string name;
+    string surname;
+    string gmail;
+    string username1;
+    string password1;
+public:
+    void Show() {
+        cout << YELLOW << "Enter the Info\nName: " << RESET;
+        cin >> name;
+        cout << YELLOW << "Surname: " << RESET;
+        cin >> surname;
+        bool a = true;
+        while (a) {
+            cout << YELLOW << "Gmail: " << RESET;
+            cin >> gmail;
+            string check = "@gmail.com";
+            if (gmail.length() >= check.length() && gmail.substr(gmail.length() - check.length()) == check) {
+                a = false;
+            }
+            else {
+                cout << RED << "Error: Wrong gmail type \n" << RESET;
+                continue;
+            }
+        }
+        bool b = true;
+        while (b) {
+            cout << YELLOW << "Username: " << RESET;
+            cin >> username1;
+            cout << YELLOW << "Password: " << RESET;
+            cin >> password1;
+            if (password1.length() < 8) {
+                cout << RED << "\nError: Password 8 Simvoldan cox olmalidir !!!\n" << RESET;
+                continue;
+            }
+            else {
+                b = false;
+            }
+        }
+        cout << GREEN << "Register successful\n" << RESET;
+    }
+};
+class Enter : public Register {
+    int secim = 2;
+    string Username;
+    string Password;
+public:
+    vector<Food> foods;
+    bool admin = false;
+    void ac() {
+        bool c = true;
+        while (c) {
+            try {
+                cout << "\n1.Admin\n2.Coustumer\nSecim: ";
+                cin >> secim;
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(10000, '\n');
+                    throw "Reqem daxil et!";
+                }
+                if (secim == 1) {
+                    cout << YELLOW << "Username: " << RESET;
+                    cin >> Username;
+                    cout << YELLOW << "Password: " << RESET;
+                    cin >> Password;
+                    if (Username != username1) {
+                        throw "Username entered incorrectly !!!";
+                    }
+                    if (Password != password1) {
+                        throw "Password incorrect !!!";
+                    }
+                    cout << GREEN << "Hello Admin.\n" << RESET;
+                    admin = true;
+                    c = false;
+                }
+                else if (secim < 0 || secim > 2) {
+                    throw " Wrong choise: ";
+                }
+                else if (secim == 2) {
+                    cout << GREEN << "Hello valuable customer \nWelcome to Yusuf Restorant.\n" << RESET;
+                    admin = false;
+                    c = false;
+                }
+            }
+            catch (const char* error) {
+                cout << RED << "\nError: " << error << RESET << endl;
+            }
+        }
+    }
+};
+
+class Admin : public Enter {
+public:
+    double Balance = 10000;
+    double gelir = 0;
+    double ziyan = 0;
+    vector<Ingredient> stock;
+    vector<CITEM> Coustumer_C;
+    void LLfood() {
+        foods.clear();
+        ifstream file("menu.txt");
+        if (file.is_open()) {
+            string line;
+            while (getline(file, line)) {
+                if (line.find("Food Name:", 0) == 0) {
+                    Food food;
+                    food.name = line.substr(11);
+                    while (getline(file, line)) {
+                        if (line.find(" - ", 0) == 0) {
+                            string ingLine = line.substr(3);
+                        }
+                        else if (line.find("Price:", 0) == 0) {
+                            try {
+                                food.price = stod(line.substr(7));
+                            }
+                            catch (...) {
+                                food.price = 0;
+                            }
+                        }
+                        else if (line.find("---", 0) == 0) {
+                            break;
+                        }
+                    }
+                    foods.push_back(food);
+                }
+            }
+            file.close();
+        }
+    }
+    void Aing() {
+        stock.clear();
+        ifstream file("ingredients.txt");
+        if (!file.is_open()) {
+            return;
+        }
+        Ingredient ing;
+        while (file >> ing.name >> ing.KG >> ing.P_KG) {
+            stock.push_back(ing);
+        }
+        file.close();
+    }
+    void SingF() {
+        ofstream file("ingredients.txt");
+        for (int i = 0; i < stock.size(); i++) {
+            file << stock[i].name << " " << stock[i].KG << " " << stock[i].P_KG << endl;
+        }
+        file.close();
+    }
+    void SstF() {
+        ofstream file("statistics.txt");
+        file << "Balance: " << Balance << "\nTGelir: " << gelir << "\nZiyan: " << ziyan << endl;
+        file.close();
+    }
+    double IngPrice(string name) {
+        for (int i = 0; i < stock.size(); i++) {
+            if (stock[i].name == name) {
+                return stock[i].P_KG;
+            }
+        }
+    }
+    void restock(string name, double amount) {
+        for (int i = 0; i < stock.size(); i++) {
+            if (stock[i].name == name) {
+                stock[i].KG -= amount;
+            }
+        }
+    }
+    void showStock() {
+        cout << "\n<|>Stock<|>\n";
+        for (int i = 0; i < stock.size(); i++) {
+            cout << YELLOW << stock[i].name << " | " << stock[i].KG << " KG | " << stock[i].P_KG << " $\n" << RESET;
+        }
+    }
+    bool Checking(string name, double amount) {
+        for (int i = 0; i < stock.size(); i++) {
+            if (stock[i].name == name) {
+                if (stock[i].KG >= amount) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+    void adding() {
+        Ingredient ing;
+        cout << "Ingredient name: ";
+        cin >> ing.name;
+        cout << "KG: ";
+        cin >> ing.KG;
+        cout << "Price KG: ";
+        cin >> ing.P_KG;
+        bool ffind = false;
+        for (int i = 0; i < stock.size(); i++) {
+            if (stock[i].name == ing.name) {
+                stock[i].KG += ing.KG;
+                ffind = true;
+                break;
+            }
+        }
+        if (!ffind) {
+            stock.push_back(ing);
+        }
+        double ziyan = ing.KG * ing.P_KG;
+        Balance -= ziyan;
+        ziyan += ziyan;
+        SingF();
+        SstF();
+        cout << GREEN << "Ingredient added.\n" << RESET;
+    }
+    void showstati() {
+        cout << "\n---->Yusuf Stati<----\n";
+        cout << "Balance: " << Balance << " $\n" << "Gelir: " << gelir << " $\n" << "Ziyan: " << ziyan << " $\n";
+        cout << "--------------------------------\n";
+    }
+    void showHistory() {
+        cout << "\n---->HISTORY<----\n";
+        ifstream file("history.txt");
+        if (!file.is_open()) {
+            cout << RED << "Error: history is empty\n" << RESET;
+            return;
+        }
+        string line;
+        while (getline(file, line)) {
+            cout << line << endl;
+        }
+        file.close();
+    }
+    void menu() {
+        while (true) {
+            if (admin == true) {
+                int secim1;
+                cout << YELLOW << "\n1.Add Food\n2.Delete Food\n3.Add Ingredient\n4.Show Statistics\n5.Exit Admin Menu\nSecim: " << RESET;
+                cin >> secim1;
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(10000, '\n');
+                    cout << RED << "Error: You can only integer type!!!\n" << RESET;
+                    continue;
+                }
+                if (secim1 == 5) {
+                    break;
+                }
+                if (secim1 == 1) {
+                    ofstream file("menu.txt", ios::app);
+                    string fname;
+                    cout << YELLOW << "Food name: " << RESET;
+                    cin.ignore(10000, '\n');
+                    getline(cin, fname);
+                    int count;
+                    cout << YELLOW << "What are the ingredients of the food ? \nCount: " << RESET;
+                    cin >> count;
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        cout << RED << "Error: You can only integer!!!\n" << RESET;
+                        continue;
+                    }
+                    double price;
+                    cout << YELLOW << "Price: " << RESET;
+                    cin >> price;
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        cout << RED << "Error: You can only integer or double type!!!\n" << RESET;
+                        continue;
+                    }
+                    if (count <= 0) {
+                        cout << RED << "Error: Count is unsimend\n" << RESET;
+                        continue;
+                    }
+                    else {
+                        Food food;
+                        food.name = fname;
+                        food.price = price;
+                        file << "Food Name: " << fname << endl;
+                        for (int i = 0; i < count; i++) {
+                            string ing;
+                            double amount;
+                            cout << i + 1 << ".Ingredient name: ";
+                            cin >> ing;
+                            cout << "KG: ";
+                            cin >> amount;
+                            file << " - " << ing << " " << amount << endl;
+                            food.ingredients.push_back({ ing, amount });
+                        }
+                        foods.push_back(food);
+                        file << "Price: " << price << endl;
+                        file.close();
+                        cout << GREEN << "Food added successful\n" << RESET;
+                    }
+                }
+                else if (secim1 == 2) {
+                    if (foods.empty()) {
+                        cout << RED << "Error: Menu is empty!\n" << RESET;
+                        continue;
+                    }
+                    cout << "\n---->FOOD<----\n";
+                    for (int i = 0; i < foods.size(); i++) {
+                        cout << YELLOW << i + 1 << ". " << foods[i].name << RESET << endl;
+                    }
+                    int dsecim;
+                    cout << YELLOW << "\nWhich food delete: " << RESET;
+                    cin >> dsecim;
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        cout << RED << "Error: You can only cin ibnteger type!!!\n" << RESET;
+                        continue;
+                    }
+                    if (dsecim < 1 || dsecim > foods.size()) {
+                        cout << RED << "Wrong choice!\n" << RESET;
+                        continue;
+                    }
+                    foods.erase(foods.begin() + dsecim - 1);
+                    ofstream file("menu.txt");
+                    for (int i = 0; i < foods.size(); i++) {
+                        file << "Food Name: " << foods[i].name << endl;
+                        for (int j = 0; j < foods[i].ingredients.size(); j++) {
+                            file << " - " << foods[i].ingredients[j].first << " " << foods[i].ingredients[j].second << endl;
+                        }
+                        file << "Price: " << foods[i].price << endl;
+                    }
+                    file.close();
+                    cout << GREEN << "\nFood deleted successfully.\n" << RESET;
+                }
+                else if (secim1 == 3) {
+                    adding();
+                }
+                else if (secim1 == 4) {
+                    showstati();
+                }
+            }
+            else {
+                cout << YELLOW << "\n1.Show menu and Show basket\n2.Show basket and payment\n3.Show history\n4.Exit\nChoise: " << RESET;
+                int Cchoise;
+                cin >> Cchoise;
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(10000, '\n');
+                    cout << RED << "Error: Reqem daxil edin!\n" << RESET;
+                    continue;
+                }
+                if (Cchoise == 4) {
+                    admin = false;
+                    return;
+                }
+                if (Cchoise == 1) {
+                    int foodsay = 0;
+                    vector<Food> Lost;
+                    cout << "\n---->MENU<----\n";
+                    for (int i = 0; i < foods.size(); i++) {
+                        bool Check = true;
+                        for (int j = 0; j < foods[i].ingredients.size(); j++) {
+                            if (!Checking(foods[i].ingredients[j].first, foods[i].ingredients[j].second)) {
+                                Check = false;
+                                break;
+                            }
+                        }
+                        if (Check) {
+                            foodsay++;
+                            cout << foodsay << ". " << foods[i].name << " - " << foods[i].price << " $\n";
+                            Lost.push_back(foods[i]);
+                        }
+                    }
+                    if (foodsay == 0) {
+                        cout << RED << "Error: INg yetersizdir!!!\n" << RESET;
+                        continue;
+                    }
+                    int secim;
+                    cout << "\nChoise: ";
+                    cin >> secim;
+                    if (cin.fail() || secim < 0 || secim > foodsay) {
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        cout << RED << "\nError: Wrong Choise !!!\n" << RESET;
+                        continue;
+                    }
+                    if (secim == 0) {
+                        continue;
+                    }
+                    Food Cfood = Lost[secim - 1];
+                    double extra_price = 0;
+                    cout << YELLOW << "\nFooda neyse artiq bir sey isetyirsen ?\n1.He-2$\n2.Yox\nSecim: " << RESET;
+                    int exSecim; cin >> exSecim;
+                    if (exSecim == 1) {
+                        extra_price = 2.00;
+                        if (!Cfood.ingredients.empty()) {
+                            Cfood.ingredients[0].second *= 2;
+                        }
+                    }
+                    CITEM CI;
+                    CI.food = Cfood;
+                    CI.extraPrice = extra_price;
+                    Coustumer_C.push_back(CI);
+                    cout << GREEN << "Yemek sebete elave edildi.\n" << RESET;
+                }
+                else if (Cchoise == 2) {
+                    if (Coustumer_C.empty()) {
+                        cout << RED << "Error: Your baset is empty!!!\n" << RESET;
+                        continue;
+                    }
+                    double Total_price = 0;
+                    cout << "\n----BASKET----\n";
+                    for (int i = 0; i < Coustumer_C.size(); i++) {
+                        double hesab = Coustumer_C[i].food.price + Coustumer_C[i].extraPrice;
+                        cout << i + 1 << ". " << Coustumer_C[i].food.name << " - " << hesab << " $\n";
+                        Total_price += hesab;
+                    }
+                    cout << YELLOW << "\nUmumi Mebleg: " << Total_price << " $\n" << RESET;
+                    cout << YELLOW << "\n1.Payment\n2.clear the bascet\nChoise: " << RESET;
+                    int CHOISE_JK;
+                    cin >> CHOISE_JK;
+                    if (CHOISE_JK == 1) {
+                        bool STOK_Y = true;
+                        for (int i = 0; i < Coustumer_C.size(); i++) {
+                            for (int j = 0; j < Coustumer_C[i].food.ingredients.size(); j++) {
+                                if (!Checking(Coustumer_C[i].food.ingredients[j].first, Coustumer_C[i].food.ingredients[j].second)) {
+                                    STOK_Y = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!STOK_Y) {
+                            cout << RED << "Error: Stoklardaki mal bitdi\n" << RESET;
+                            continue;
+                        }
+                        cout << YELLOW << "\n1.Cash\n2.Card\nChoise: " << RESET;
+                        int s;
+                        cin >> s;
+                        cout << YELLOW << "Money: " << RESET;
+                        double money;
+                        cin >> money;
+                        if (cin.fail() || money < Total_price) {
+                            cin.clear(); cin.ignore(10000, '\n');
+                            cout << RED << "Error: PULUN CATMIR KASIB\n" << RESET;
+                            continue;
+                        }
+                        cout << GREEN << "Payment secsesful.\n" << RESET;
+                        if (money > Total_price) {
+                            cout << GREEN << "Thank you for gift.\n" << RESET;
+                        }
+                        ofstream MRX("history.txt", ios::app);
+                        for (int i = 0; i < Coustumer_C.size(); i++) {
+                            Food f = Coustumer_C[i].food;
+                            for (int j = 0; j < f.ingredients.size(); j++) {
+                                restock(f.ingredients[j].first, f.ingredients[j].second);
+                            }
+                            MRX << "User: " << username1 << " | Food: " << f.name << " | Price: " << (f.price + Coustumer_C[i].extraPrice) << " $ | Date: 31.05.2026\n";
+                        }
+                        MRX.close();
+                        Balance = Balance + Total_price;
+                        gelir = gelir + Total_price;
+                        SingF();
+                        SstF();
+                        Coustumer_C.clear();
+                        ac();
+                    }
+                    else if (CHOISE_JK == 2) {
+                        Coustumer_C.clear();
+                        cout << "Sebet temizlendi.\n";
+                    }
+                }
+                else if (Cchoise == 3) {
+                    showHistory();
+                }
+            }
+        }
+    }
+};
+
+int main() {
+    Admin e;
+    e.LLfood();
+    e.Aing();
+    //e.showStock();
+    e.Show();
+    while (true) {
+        e.ac();
+        e.menu();
+        int again;
+        cout << "\n1.Back Menu\n2.Exit\nChoice: ";
+        cin >> again;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Error: You can only cin interger type!!!\n";
+            continue;
+        }
+        if (again == 2) {
+            break;
+        }
+        else {
+            cout << endl;
+        }
+    }
+    return 0;
+}
